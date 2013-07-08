@@ -12,7 +12,7 @@
 #pragma warning(disable: 4996)
 #include "mersenneTwisterRandNumGen.h"
 using namespace std;
-////////////////////////////// PRIME NUMBER TEST //////////////////////////////
+////////////////////////////// PRIME NUMBER TEST /////////////////////////////////////////////////
 /* Miller-Rabin primality test, iteration signifies the accuracy of the test */
 /* This function calculates (ab)%c */
 int modulo(int a,int b,int c){
@@ -63,14 +63,20 @@ bool isPrime_Miller(long long p,int iteration){
     }
     return true;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////// 5 Number Rule //////////////////
 // Accept Condition for the 5 number combination
 #define MIN_EVEN_COUNT_5N  2
 #define MIN_ODD_COUNT_5N   1
 #define MIN_PRIME_COUNT_5N 1
 // Reject Condition for the 5 number combination
-#define MAX_PRIME_COUNT_5N 3 
+//#define MAX_PRIME_COUNT_5N 3 
+// 50% Accept / Reject 
+#define HALF_PROB_EVEN_COUNT_5N 3 /* Accept/Reject - 50% of time if the prime count is 3*/
+#define HALF_PROB_ODD_COUNT_5N 2
+#define HALF_PROB_PRIME_COUNT_5N 2 
+
+
 ///////////////////////////////////////////////
 bool is_5_NumberProperty(int* pA) {
 	int prime =0, odd =0, even =0;
@@ -83,15 +89,38 @@ bool is_5_NumberProperty(int* pA) {
 			++odd;
 	}
 
-	 if(prime == MAX_PRIME_COUNT_5N)  // Reject
+	if(even > (HALF_PROB_EVEN_COUNT_5N +1))  // Reject
 		return false;
-	else if((even == MIN_EVEN_COUNT_5N) && (odd == MIN_ODD_COUNT_5N )   
-		                       && (prime == MIN_PRIME_COUNT_5N )) // Accept
+
+	if(prime == HALF_PROB_EVEN_COUNT_5N) {
+		if(rand() % 2) /*Check the 50% probability */
+			return false;
+		}
+
+   if(even > (HALF_PROB_ODD_COUNT_5N +1))  // Reject
+		return false;
+
+	if(even == HALF_PROB_ODD_COUNT_5N) {
+		if(rand() % 2) /*Check the 50% probability */
+			return false;
+		}
+
+	if(even > (HALF_PROB_PRIME_COUNT_5N +1))  // Reject
+		return false;
+
+	if(even == HALF_PROB_PRIME_COUNT_5N) {
+		if(rand() % 2) /*Check the 50% probability */
+			return false;
+		}
+
+	
+	 if((even >= MIN_EVEN_COUNT_5N) && (odd >= MIN_ODD_COUNT_5N )   
+		                       && (prime >= MIN_PRIME_COUNT_5N )) // Accept
 							   return true;
 	else
 		return false;
 }
-////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////// 2 Number Rule //////////////////
 // Accept Condition for the 2 number combination
 #define MIN_EVEN_COUNT_2N  2
@@ -142,14 +171,15 @@ int main() {
 	int n=0, randomNo = 0;
 	bool space = true;
 	int one=0,two=0,three=0,four=0,five=0;
+	int millionairLine_5 = 0, millionairLine_2 = 0;
 
 	// 5 Balls
-	std::ifstream Ballfile("input\\Ball5.txt");
+	std::ifstream iBallfile("input\\Ball5.txt");
 	// Clear Input Stream
-	Ballfile.clear();
-	Ballfile.seekg(0, ios::beg);
+	iBallfile.clear();
+	iBallfile.seekg(0, ios::beg);
 
-	while(std::getline(Ballfile, line))
+	while(std::getline(iBallfile, line))
 		{
 		std::stringstream linestream(line);
 		if (linestream >> one >> two >> three >> four >> five)
@@ -162,14 +192,14 @@ int main() {
 			Ball.push_back(five);
 			}
 		}
-	Ballfile.close();
+	iBallfile.close();
 
 	//  2 Lucky Stars
-	std::ifstream Luckyfile("input\\Lucky2.txt");
+	std::ifstream iLuckyfile("input\\Lucky2.txt");
 	// Clear Input Stream
-	Luckyfile.clear();
-	Luckyfile.seekg(0, ios::beg);
-	while(std::getline(Luckyfile, line))
+	iLuckyfile.clear();
+	iLuckyfile.seekg(0, ios::beg);
+	while(std::getline(iLuckyfile, line))
 		{
 		std::stringstream linestream(line);
 		if (linestream >> one >> two)
@@ -179,11 +209,11 @@ int main() {
 			Luc.push_back(two);
 			}
 		}
-	Luckyfile.close();	
+	iLuckyfile.close();	
 
-
-	ofstream oBallFile("output\\oBall5.txt");
-	ofstream oLuckyfile("output\\oLucky2.txt");
+// STAGE 1: Process - Shuffle the numbers
+	ofstream oS_BallFile("output\\stage1_Shuffle_Ball5.txt");
+	ofstream oS_Luckyfile("output\\stage1_Shuffle_Lucky2.txt");
 	///int BallNo = 0;
 	
 
@@ -194,7 +224,8 @@ int main() {
 
 		// 5 Balls
 		for(int bCount=0; bCount<5; ++bCount) {
-			ret = BallResult.insert(Ball[(int)irand() % Ball.size()]);
+			// Store the Random values in sorted order
+			ret = BallResult.insert(Ball[(int)irand() % Ball.size()]);			
 			// Check the duplicate
 			if (ret.second==false) {
 				bCount = bCount - 1;
@@ -215,15 +246,15 @@ int main() {
 		// Print the randomly generated Millionaire number with lucky star
 		for ( it=BallResult.begin() ; it != BallResult.end(); ++it ) {
 			cout<<*it<<" ";   // Writing in console
-			oBallFile<<*it<<" "; // Writing in file
+			oS_BallFile<<*it<<" "; // Writing in file
 			}
-		oBallFile<<endl;
+		oS_BallFile<<endl;
 		cout<<" / ";
 		for ( it=LucResult.begin() ; it != LucResult.end(); ++it ) {
 			cout<<*it<<" ";
-			oLuckyfile<<*it<<" ";
+			oS_Luckyfile<<*it<<" ";
 			}
-		oLuckyfile<<endl;
+		oS_Luckyfile<<endl;
 		cout<<endl;
 
 		// Clear the set containers
@@ -231,62 +262,70 @@ int main() {
 		LucResult.clear();
 }
 
-	oBallFile.close();
-	oLuckyfile.close();
-////////////////////////////////////////////////////////////////////////////////////
-ifstream randBallFile("output\\oBall5.txt");
-ofstream ruleBallFile("output\\rBall5.txt");
+	oS_BallFile.close();
+	oS_Luckyfile.close();
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// STAGE 2: Select the number sets which satisfies the combination property(rule) 
+ifstream iRandBallFile("output\\stage1_Shuffle_Ball5.txt");
+ofstream oRuleBallFile("output\\stage2_Rule_Select_Ball5.txt");
 int nLines_ruleBallFile =0;
 
 // Clear Input Stream
-	randBallFile.clear();
-	randBallFile.seekg(0, ios::beg);
+	iRandBallFile.clear();
+	iRandBallFile.seekg(0, ios::beg);
 	int fiveBall[5] = {0};
-	while(std::getline(randBallFile, line))
+	while(std::getline(iRandBallFile, line))
 		{
 		std::stringstream linestream(line);
 		if (linestream >> fiveBall[0] >> fiveBall[1] >> fiveBall[2] >> fiveBall[3] >> fiveBall[4])
 			{
 
 			  if(is_5_NumberProperty(fiveBall)) {
-				  ruleBallFile << fiveBall[0] <<" "<< fiveBall[1] <<" "<< fiveBall[2] <<" "
+				  oRuleBallFile << fiveBall[0] <<" "<< fiveBall[1] <<" "<< fiveBall[2] <<" "
 				  << fiveBall[3] <<" "<< fiveBall[4] << endl;
 				  ++nLines_ruleBallFile;
 				  }
 
 			}
 		}
-	ruleBallFile.close();
-	randBallFile.close();
+
+	if(0 == nLines_ruleBallFile){
+oRuleBallFile<<"There is no BALL 5 combination satisfies the rules - Try once again !!!";
+}
+
+	oRuleBallFile.close();
+	iRandBallFile.close();
 
 
-ifstream randLuckyFile("output\\oLucky2.txt");
-ofstream ruleLuckyFile("output\\rLucky2.txt");
+ifstream iRandLuckyFile("output\\stage1_Shuffle_Lucky2.txt");
+ofstream oRuleLuckyFile("output\\stage2_Rule_Select_Lucky2.txt");
 int nLines_ruleLuckyFile = 0;
 
 // Clear Input Stream
-	randLuckyFile.clear();
-	randLuckyFile.seekg(0, ios::beg);
+	iRandLuckyFile.clear();
+	iRandLuckyFile.seekg(0, ios::beg);
 	int twoBall[2] = {0};
-	while(std::getline(randLuckyFile, line))
+	while(std::getline(iRandLuckyFile, line))
 		{
 		std::stringstream linestream(line);
 		if (linestream >> twoBall[0] >> twoBall[1])
 			{
 			  if(is_2_NumberProperty(twoBall)) {
-				  ruleLuckyFile << twoBall[0] <<" "<< twoBall[1] << endl;
+				  oRuleLuckyFile << twoBall[0] <<" "<< twoBall[1] << endl;
 				  ++nLines_ruleLuckyFile;
 				  }
-
 			}
 		}
-ruleLuckyFile.close();
-randLuckyFile.close();
 
+	if(0 == nLines_ruleLuckyFile){
+oRuleLuckyFile<<"There is no BALL 2 combination satisfies the rules - Try once again !!!";
+}
 
+oRuleLuckyFile.close();
+iRandLuckyFile.close();
 
-ifstream iRuleBallFile("output\\rBall5.txt");
-ifstream iRuleLuckyFile("output\\rLucky2.txt");
+ifstream iRuleBallFile("output\\stage2_Rule_Select_Ball5.txt");
+ifstream iRuleLuckyFile("output\\stage2_Rule_Select_Lucky2.txt");
 // Writing the Millionaire Making Number
 freopen("output\\MillionaireMakingNumber.txt", "w", stdout);
 
@@ -297,10 +336,14 @@ iRuleLuckyFile.clear();
 iRuleLuckyFile.seekg(0, ios::beg);
 line = "";
 
-int millionairLine_5 = 0, millionairLine_2 = 0;
-
+if((0 == nLines_ruleBallFile) || (0 == nLines_ruleLuckyFile)){
+cout<<"There is no BALL 5 / Ball 2 combination satisfies the rules - Try once again !!!";
+millionairLine_5 = millionairLine_2 = 0;
+	}else
+		{
 millionairLine_5 = rand() % nLines_ruleBallFile;
 millionairLine_2 = rand() % nLines_ruleLuckyFile;
+}
 
 // 5 Numbers - Pick a random BALL Line
 for(int LineCount=0; LineCount < millionairLine_5; ++LineCount){
@@ -319,67 +362,7 @@ for(int LineCount=0; LineCount < millionairLine_2; ++LineCount){
 	cout<<line;
 	cout<<"\n***************************************************";
 
-///////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 	return 0;
 }
 
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////
-
-// BALL
-/*
-while(!infile.eof()) {
-std::getline(infile, line);
-std::istringstream iss(line);
-for(int i =0; i< line.length(); ++i) {
-if((line[i] !=' ') && (line[i] != '-')) {
-num += line[i];
-space = true;
-}
-else if(line[i] ==' '){
-if(space) {
-space = false;
-n = atoi (num.c_str());
-Ball.push_back(n);
-num = "";
-i +=2;
-}
-}
-}
-//n = atoi (num.c_str());
-//Ball.push_back(n);
-num = "";
-}
-
-
-
-// LUCKY
-while(!Luckyfile.eof()) {
-std::getline(Luckyfile, line);
-std::istringstream iss(line);
-
-for(int i =0; i< line.length(); ++i) {
-if((line[i] !=' ') && (line[i] != '-')) {
-num += line[i];
-space = true;
-}
-else if(line[i] ==' '){
-if(space) {
-space = false;
-n = atoi (num.c_str());
-Luc.push_back(n);
-num = "";
-i +=2;
-}
-}
-}
-n = atoi (num.c_str());
-Luc.push_back(n);
-num = "";
-}
-
-*/
