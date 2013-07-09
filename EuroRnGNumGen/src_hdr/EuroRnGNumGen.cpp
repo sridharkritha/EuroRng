@@ -63,6 +63,12 @@ bool isPrime_Miller(long long p,int iteration){
     }
     return true;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// PERCENTAGE (%) OF WINNING CHANCE //////////////////////////////////////
+bool YESorNO(int percentage) {
+  return rand()%100 < percentage; 
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////// 5 Number Rule //////////////////
 // Accept Condition for the 5 number combination
@@ -70,16 +76,21 @@ bool isPrime_Miller(long long p,int iteration){
 #define MIN_ODD_COUNT_5N   1
 #define MIN_PRIME_COUNT_5N 1
 // Reject Condition for the 5 number combination
+#define MAX_SINGLE_DIGIT   4
 //#define MAX_PRIME_COUNT_5N 3 
 // 50% Accept / Reject 
 #define HALF_PROB_EVEN_COUNT_5N 3 /* Accept/Reject - 50% of time if the prime count is 3*/
 #define HALF_PROB_ODD_COUNT_5N 2
 #define HALF_PROB_PRIME_COUNT_5N 2 
+// 80% Accept 
+#define EIGHTY_PERCENTAGE_SINGLE_DIGIT 1
+#define FORTY_PERCENTAGE_SINGLE_DIGIT  2
+#define TEN_PERCENTAGE_SINGLE_DIGIT    3  /* Three single digit combination */
 
 
 ///////////////////////////////////////////////
 bool is_5_NumberProperty(int* pA) {
-	int prime =0, odd =0, even =0;
+	int prime =0, odd =0, even =0, single = 0;
 	for(int i=0; i<5; ++i) {
 		if(0 == pA[i] % 2)
 			 ++even;
@@ -87,21 +98,37 @@ bool is_5_NumberProperty(int* pA) {
 			++prime;
 		else
 			++odd;
+
+		// Single Digit
+		if(pA[i] < 10)
+			++single;
 	}
+
+	if (single >=MAX_SINGLE_DIGIT) // 4 Single digit
+		return false;
+	else if (single = TEN_PERCENTAGE_SINGLE_DIGIT) // 3 Single digit
+		    if (!YESorNO(10))
+				return false;		
+	else if (single = FORTY_PERCENTAGE_SINGLE_DIGIT) // 2 Single digit		
+		   if(!YESorNO(40))
+		     return false;
+	else if (single = EIGHTY_PERCENTAGE_SINGLE_DIGIT) // 1 Single digit		
+		   if(!YESorNO(80))
+		     return false;
 
 	if(even > (HALF_PROB_EVEN_COUNT_5N +1))  // Reject
 		return false;
 
 	if(prime == HALF_PROB_EVEN_COUNT_5N) {
-		if(rand() % 2) /*Check the 50% probability */
-			return false;
+		   if(YESorNO(50))  /*Check the 50% probability  or [ rand() % 2 ] - like Coin toss */
+			  return false;
 		}
 
    if(even > (HALF_PROB_ODD_COUNT_5N +1))  // Reject
 		return false;
 
 	if(even == HALF_PROB_ODD_COUNT_5N) {
-		if(rand() % 2) /*Check the 50% probability */
+		 if(YESorNO(50)) /*Check the 50% probability */
 			return false;
 		}
 
@@ -109,7 +136,7 @@ bool is_5_NumberProperty(int* pA) {
 		return false;
 
 	if(even == HALF_PROB_PRIME_COUNT_5N) {
-		if(rand() % 2) /*Check the 50% probability */
+		 if(YESorNO(50)) /*Check the 50% probability */
 			return false;
 		}
 
