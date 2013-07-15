@@ -84,7 +84,9 @@ bool YESorNO(int percentage) {
 #define HALF_PROB_PRIME_COUNT_5N 2 
 // 80% Accept 
 #define EIGHTY_PERCENTAGE_SINGLE_DIGIT 1
+// 40% Accept
 #define FORTY_PERCENTAGE_SINGLE_DIGIT  2
+// 10% Accept
 #define TEN_PERCENTAGE_SINGLE_DIGIT    3  /* Three single digit combination */
 
 
@@ -154,11 +156,21 @@ bool is_5_NumberProperty(int* pA) {
 #define MIN_ODD_COUNT_2N   1
 #define MIN_PRIME_COUNT_2N 1
 // Reject Condition for the 2 number combination
-#define MAX_PRIME_COUNT_2N 3  
+// 40% Accept
+#define EQUAL_OR_MORE_THAN_10_2N 3  
 ///////////////////////////////////////////////
 bool is_2_NumberProperty(int* pA) {
 	int prime =0, odd =0, even =0;
 	for(int i=0; i<2; ++i) {
+
+         if(10 <= pA[i]) // 35% chance for more 10 and 11
+           if(!YESorNO(35))
+		     return false;
+
+		  if(6 <= pA[i])
+           if(!YESorNO(80))
+		     return false;
+
 		if(0 == pA[i] % 2)
 			 ++even;
 		else if(isPrime_Miller(pA[i],3))
@@ -166,14 +178,10 @@ bool is_2_NumberProperty(int* pA) {
 		else
 			++odd;
 	}
-
-	 if(prime == MAX_PRIME_COUNT_2N)  // Reject
-		return false;
-	else if((even == MIN_EVEN_COUNT_2N) && (odd == MIN_ODD_COUNT_2N)   
-		                       && (prime == MIN_PRIME_COUNT_2N )) // Accept
-							   return true;
-	else
-		return false;
+	if(even == MIN_EVEN_COUNT_2N) {  // Reject
+		  if(!YESorNO(25)) /*Check the 50% probability */
+			return false;
+		}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
