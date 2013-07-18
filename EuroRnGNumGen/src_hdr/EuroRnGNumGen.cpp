@@ -66,9 +66,15 @@ bool isPrime_Miller(long long p,int iteration){
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////// PERCENTAGE (%) OF WINNING CHANCE //////////////////////////////////////
-bool YESorNO(int percentage) {
+bool ACCEPT(int percentage) {
   return rand()%100 < percentage; 
 }
+
+bool REJECT(int percentage) {
+  return !(rand()%100 < percentage); 
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////// 5 Number Rule //////////////////
 // Accept Condition for the 5 number combination
@@ -109,20 +115,20 @@ bool is_5_NumberProperty(int* pA) {
 	if (single >=MAX_SINGLE_DIGIT) // 4 Single digit
 		return false;
 	else if (single = TEN_PERCENTAGE_SINGLE_DIGIT) // 3 Single digit
-		    if (!YESorNO(10))
+		    if (!ACCEPT(10))
 				return false;		
 	else if (single = FORTY_PERCENTAGE_SINGLE_DIGIT) // 2 Single digit		
-		   if(!YESorNO(40))
+		   if(!ACCEPT(40))
 		     return false;
 	else if (single = EIGHTY_PERCENTAGE_SINGLE_DIGIT) // 1 Single digit		
-		   if(!YESorNO(80))
+		   if(!ACCEPT(80))
 		     return false;
 
 	if(even > (HALF_PROB_EVEN_COUNT_5N +1))  // Reject
 		return false;
 
 	if(prime == HALF_PROB_EVEN_COUNT_5N) {
-		   if(YESorNO(50))  /*Check the 50% probability  or [ rand() % 2 ] - like Coin toss */
+		   if(ACCEPT(50))  /*Check the 50% probability  or [ rand() % 2 ] - like Coin toss */
 			  return false;
 		}
 
@@ -130,7 +136,7 @@ bool is_5_NumberProperty(int* pA) {
 		return false;
 
 	if(even == HALF_PROB_ODD_COUNT_5N) {
-		 if(YESorNO(50)) /*Check the 50% probability */
+		 if(ACCEPT(50)) /*Check the 50% probability */
 			return false;
 		}
 
@@ -138,7 +144,7 @@ bool is_5_NumberProperty(int* pA) {
 		return false;
 
 	if(even == HALF_PROB_PRIME_COUNT_5N) {
-		 if(YESorNO(50)) /*Check the 50% probability */
+		 if(ACCEPT(50)) /*Check the 50% probability */
 			return false;
 		}
 
@@ -163,12 +169,8 @@ bool is_2_NumberProperty(int* pA) {
 	int prime =0, odd =0, even =0;
 	for(int i=0; i<2; ++i) {
 
-         if(10 <= pA[i]) // 35% chance for more 10 and 11
-           if(!YESorNO(35))
-		     return false;
-
-		  if(6 <= pA[i])
-           if(!YESorNO(80))
+         if(10 <= pA[i]) // 35% chance for more than 10 and 11
+           if(!ACCEPT(35))
 		     return false;
 
 		if(0 == pA[i] % 2)
@@ -177,11 +179,28 @@ bool is_2_NumberProperty(int* pA) {
 			++prime;
 		else
 			++odd;
+
+
+		if((0 == odd)||(2== odd))
+			if(!ACCEPT(85))
+				return false;
+
+		
 	}
 	if(even == MIN_EVEN_COUNT_2N) {  // Reject
-		  if(!YESorNO(25)) /*Check the 50% probability */
+		  if(!ACCEPT(25)) /*Check the 50% probability */
 			return false;
 		}
+
+
+	if((pA[0] <=5) && (pA[1] <= 5))
+		if(!ACCEPT(70))
+			return false;
+
+	if((pA[0] >=6) && (pA[1] >= 6))
+		if(!ACCEPT(70))
+			return false;
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
