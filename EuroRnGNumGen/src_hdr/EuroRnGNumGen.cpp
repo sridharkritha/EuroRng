@@ -12,6 +12,10 @@
 #pragma warning(disable: 4996)
 #include "mersenneTwisterRandNumGen.h"
 using namespace std;
+
+// Global Declaration
+unsigned long init[1] = {(unsigned long)time(NULL)}, length = 1;
+MTRand_int32 irand(init, length); // 32-bit int generator
 ////////////////////////////// PRIME NUMBER TEST /////////////////////////////////////////////////
 /* Miller-Rabin primality test, iteration signifies the accuracy of the test */
 /* This function calculates (ab)%c */
@@ -67,11 +71,11 @@ bool isPrime_Miller(long long p,int iteration){
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////// PERCENTAGE (%) OF WINNING CHANCE //////////////////////////////////////
 bool ACCEPT(int percentage) {
-  return rand()%100 < percentage; 
+  return ((int)irand() % 100) < percentage; 
 }
 
 bool REJECT(int percentage) {
-  return !(rand()%100 < percentage); 
+  return !((int)irand()%100 < percentage); 
 }
 
 
@@ -211,8 +215,8 @@ int main() {
 	// initialize random seed: - should only be called once.
 	//unsigned long init[4J] = {0x123, 0x234, 0x345, 0x456}, length = 4;
 	//MTRand_int32 irand(init, length); // 32-bit int generator
-	unsigned long init[1] = {(unsigned long)time(NULL)}, length = 1;
-	MTRand_int32 irand(init, length); // 32-bit int generator
+	//unsigned long init[1] = {(unsigned long)time(NULL)}, length = 1;
+	//MTRand_int32 irand(init, length); // 32-bit int generator
 	//MTRand_int32 irand(time(NULL));
 	srand ((unsigned int)time(NULL)); // Initialize random seed
 	std::string line = "";
@@ -271,7 +275,7 @@ int main() {
 	///int BallNo = 0;
 	
 
-	for(int count=0; count<199; ++count)
+	for(int count=0; count<501; ++count)
 		{
 		
        // Generate Millionaire random number samples	
